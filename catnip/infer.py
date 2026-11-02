@@ -1,4 +1,4 @@
-"""Run original CAMUS, CAMUS-LQF or CAMUS-LQW with the C++ core."""
+"""Run CATNIP's original CAMUS, CAMUS-LQF or CAMUS-LQW with the C++ core."""
 import argparse
 from collections import Counter
 import csv
@@ -22,7 +22,7 @@ if not DEFAULT_MODEL.is_file():
 def binary_directory():
     """Prefer installed programs over a possibly stale source-tree build."""
     candidates=[PACKAGE/'bin']
-    candidates.extend(Path(dist.locate_file('camus_nn/bin')) for dist in distributions(name='camus-nn'))
+    candidates.extend(Path(dist.locate_file('catnip/bin')) for dist in distributions(name='catnip'))
     candidates.append(ROOT/'build')
     return next((p for p in candidates if all((p/name).is_file() for name in ('camus-native','camus-count'))),
                 PACKAGE/'bin')
@@ -184,7 +184,7 @@ def main():
     config = {k: v for k, v in vars(args).items() if not isinstance(v, Path)}
     config.update(files=files)
     save(output / 'tmp/config.json', config)
-    save(output / 'run.json',dict(schema='camus-nn-run/v1',config=config,
+    save(output / 'run.json',dict(schema='catnip-run/v1',config=config,
         inputs={name:dict(path=path,sha256=digest(path)) for name,path in files.items()},
         python=sys.version,argv=sys.argv[1:],inference_state_reused=False))
     env = dict(os.environ, TMPDIR=str(output / 'tmp'),TMP=str(output/'tmp'),TEMP=str(output/'tmp'),
@@ -195,7 +195,7 @@ def main():
     status = 'failed'
     try:
         with (output / 'run.log').open('w') as log:
-            process = subprocess.Popen([sys.executable, '-B', '-m', 'camus_nn.infer', '--_worker', str(output)],
+            process = subprocess.Popen([sys.executable, '-B', '-m', 'catnip.infer', '--_worker', str(output)],
                 stdout=log, stderr=subprocess.STDOUT, env=env, start_new_session=True)
             code = process.wait(timeout=args.timeout)
         if code:

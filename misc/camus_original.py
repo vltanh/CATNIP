@@ -33,7 +33,7 @@ def parse_arguments():
 def run_camus(args):
     """Use the package's original CAMUS pipeline and its output selection."""
     command = [
-        'camus-nn',
+        'catnip',
         '--method', 'orig',
         '--genes', str(args.gene_trees),
         '--guide', str(args.starting_tree),

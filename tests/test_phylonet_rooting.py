@@ -6,9 +6,9 @@ from pathlib import Path
 import tempfile
 from types import SimpleNamespace
 
-from camus_nn.topology import Tree
+from catnip.topology import Tree
 
-from camus_nn.rooting import root_on_outgroup, tree_graph, unrooted_splits
+from catnip.rooting import root_on_outgroup, tree_graph, unrooted_splits
 
 
 def independent_splits(text):

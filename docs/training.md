@@ -14,8 +14,8 @@ Convert a list of true networks and gene-tree files into a reusable labeled
 training table:
 
 ```bash
-camus-nn-prepare --training-cases examples/training/cases.json \
-  --output-table ../camus-results/training/quartets.csv
+catnip-prepare --training-cases examples/training/cases.json \
+  --output-table ../catnip-results/training/quartets.csv
 ```
 
 Preprocessing counts every quartet set with C++ and labels the topologies
@@ -51,18 +51,18 @@ temporary table internally.
 ```bash
 # Fit from labeled quartet rows.
 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
-  camus-nn-train --quartet-table ../camus-results/training/quartets.csv \
-  --output-model ../camus-results/training/model.json --seed 42
+  catnip-train --quartet-table ../catnip-results/training/quartets.csv \
+  --output-model ../catnip-results/training/model.json --seed 42
 
 # Fit directly from networks and gene trees.
 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
-  camus-nn-train --training-cases examples/training/cases.json \
-  --output-model ../camus-results/training/direct-model.json --seed 42
+  catnip-train --training-cases examples/training/cases.json \
+  --output-model ../catnip-results/training/direct-model.json --seed 42
 
 # Use a newly fitted model for inference.
-camus-nn --method lqw --model ../camus-results/training/model.json \
+catnip --method lqw --model ../catnip-results/training/model.json \
   --genes examples/validation/genes.nwk \
-  --guide examples/validation/guide.nwk --out ../camus-results/new-model
+  --guide examples/validation/guide.nwk --out ../catnip-results/new-model
 ```
 
 Choose exactly one of the two input arguments.
@@ -100,6 +100,10 @@ Choose exactly one of the two input arguments.
 Fitting uses float64 multilabel cross-entropy, L-BFGS-B, and weight penalty
 `1e-4`. Each network receives equal total weight, frequency-rank ties are
 treated symmetrically, and scaling is computed from training rows.
+
+New model files use the `catnip-frequency/v1` schema. Existing
+`camus-nn-frequency/v1` models are also accepted. The bundled checkpoint
+retains its original bytes and schema so its identity stays verifiable.
 
 ## Input formats
 
@@ -167,7 +171,7 @@ With the training extra installed, check the example fits with:
 
 ```bash
 python scripts/check_reproducibility.py --training \
-  --out ../camus-results/reproducibility-training
+  --out ../catnip-results/reproducibility-training
 ```
 
 This also repeats inference. Repeated seeded fits and CSV/direct training must

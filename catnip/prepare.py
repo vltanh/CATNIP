@@ -68,7 +68,7 @@ def prepare_training_csv(manifest, output, *, counter=DEFAULT_BIN_DIR / 'camus-c
         try:
             writer = csv.writer(stream, lineterminator='\n')
             writer.writerow(['case', 'split', *taxa_columns, *count_columns, 'n_loci', 'y0', 'y1', 'y2'])
-            with tempfile.TemporaryDirectory(prefix='camus-nn-prepare-') as directory:
+            with tempfile.TemporaryDirectory(prefix='catnip-prepare-') as directory:
                 counts = Path(directory) / 'counts.csv'
                 for index, case in enumerate(cases):
                     graph = nx.DiGraph(parse_network(case['network'].read_text(), allow_parallel=True))

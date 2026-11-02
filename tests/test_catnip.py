@@ -14,17 +14,17 @@ from unittest.mock import patch
 import numpy as np
 import torch
 
-from camus_nn.evidence import membership, write_evidence
-from camus_nn.io import load_model
-from camus_nn.infer import DEFAULT_BIN_DIR
-from camus_nn.iterate import anchored_tree, canonical_tree, refine, switching_guides
-from camus_nn.sampling import sample_quartets
-from camus_nn.topology import Tree, parse_network, validate_network
-from camus_nn.prepare import displayed_memberships, prepare_training_csv, read_cases
-from camus_nn.train import training_arrays
+from catnip.evidence import membership, write_evidence
+from catnip.io import load_model, save_model
+from catnip.infer import DEFAULT_BIN_DIR
+from catnip.iterate import anchored_tree, canonical_tree, refine, switching_guides
+from catnip.sampling import sample_quartets
+from catnip.topology import Tree, parse_network, validate_network
+from catnip.prepare import displayed_memberships, prepare_training_csv, read_cases
+from catnip.train import training_arrays
 
 ROOT = Path(__file__).resolve().parents[1]
-BIN = Path(os.environ.get('CAMUS_NN_BIN', DEFAULT_BIN_DIR))
+BIN = Path(os.environ.get('CATNIP_BIN', DEFAULT_BIN_DIR))
 ONE = '(OUT,((A,(B)#H1),(#H1,C)));'
 TWO = '(OUT,(((A,(B)#H1),(#H1,C)),((D,(E)#H2),(#H2,F))));'
 
@@ -47,10 +47,10 @@ def displayed_choices(network, groups):
 
 class ModelTests(unittest.TestCase):
     def test_installed_binaries_take_precedence_over_stale_source_build(self):
-        import camus_nn.infer as infer
+        import catnip.infer as infer
         from types import SimpleNamespace
         with tempfile.TemporaryDirectory() as tmp:
-            root=Path(tmp);package=root/'checkout/camus_nn';installed=root/'installed/camus_nn/bin'
+            root=Path(tmp);package=root/'checkout/catnip';installed=root/'installed/catnip/bin'
             old=root/'checkout/build'
             for folder in (old,installed):
                 folder.mkdir(parents=True)
@@ -75,6 +75,25 @@ class ModelTests(unittest.TestCase):
                                           probabilities[:, permutation])
         self.assertEqual(probabilities[0, 0], probabilities[0, 1])
         self.assertTrue(np.all(probabilities[2] == probabilities[2, 0]))
+
+    def test_legacy_and_catnip_model_schemas_preserve_predictions(self):
+        value = json.loads((ROOT / 'models/all-frequency.json').read_text())
+        counts = np.array([[6, 3, 1], [4, 4, 2], [9, 0, 1]])
+        expected = membership(counts, self.model)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'model.json'
+            for schema in ('camus-nn-frequency/v1', 'catnip-frequency/v1'):
+                with self.subTest(schema=schema):
+                    path.write_text(json.dumps(dict(value, schema=schema)))
+                    model = load_model(path)
+                    np.testing.assert_array_equal(membership(counts, model), expected)
+                    model.optimization_ = value['optimization']
+                    save_model(path, model)
+                    self.assertEqual(json.loads(path.read_text())['schema'], 'catnip-frequency/v1')
+                    np.testing.assert_array_equal(membership(counts, load_model(path)), expected)
+            path.write_text(json.dumps(dict(value, schema='unrecognized/v1')))
+            with self.assertRaisesRegex(ValueError, 'CATNIP'):
+                load_model(path)
 
     def test_locus_count_rescaling_preserves_membership_probabilities(self):
         counts = np.array([[6, 3, 1], [4, 4, 2], [9, 0, 1]])
@@ -194,7 +213,7 @@ class NativeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);guide=root/'guide.nwk';guide.write_text('((A,B),(C,D));\n')
             genes=root/'genes.nwk';genes.write_text(guide.read_text()*6+'((A,C),(B,D));\n'*4)
-            common=[sys.executable,'-B','-m','camus_nn.infer','--genes',str(genes),
+            common=[sys.executable,'-B','-m','catnip.infer','--genes',str(genes),
                 '--guide',str(guide),'--guide-rooting','supplied','--bin-dir',str(BIN)]
             for name,options in [('orig',['--method','orig']),('lqf',['--method','lqf']),
                                  ('lqw',[]),('iter',['--iterate'])]:
@@ -297,10 +316,10 @@ class NativeTests(unittest.TestCase):
             manifest = root / 'cases.json'
             manifest.write_text(json.dumps([dict(case='example', network='network.nwk', genes='genes.nwk')]))
             table = root / 'training.csv'
-            subprocess.run([sys.executable, '-m', 'camus_nn.prepare', '--training-cases', str(manifest),
+            subprocess.run([sys.executable, '-m', 'catnip.prepare', '--training-cases', str(manifest),
                             '--output-table', str(table), '--bin-dir', str(BIN)], check=True, capture_output=True)
             for mode, source in [('quartet-table', table), ('training-cases', manifest)]:
-                subprocess.run([sys.executable, '-m', 'camus_nn.train', '--' + mode, str(source),
+                subprocess.run([sys.executable, '-m', 'catnip.train', '--' + mode, str(source),
                     '--output-model', str(root / f'{mode}.json'), '--bin-dir', str(BIN)], check=True, capture_output=True)
             self.assertEqual((root / 'quartet-table.json').read_bytes(), (root / 'training-cases.json').read_bytes())
 
@@ -359,7 +378,7 @@ class NativeTests(unittest.TestCase):
             guide.write_text('(OUT,(((A,B),C),((D,E),F)));\n')
             genes = root / 'genes.nwk'
             genes.write_text(guide.read_text() * 6 + '(OUT,((A,(B,C)),(D,(E,F))));\n' * 4)
-            common = [sys.executable, '-B', '-m', 'camus_nn.infer', '--genes', str(genes),
+            common = [sys.executable, '-B', '-m', 'catnip.infer', '--genes', str(genes),
                       '--guide', str(guide), '--bin-dir', str(BIN)]
             options = [('orig', ['--model', str(root / 'no-model.json')]),
                        ('lqf', []), ('lqw', []), ('iterate', ['--iterate']),

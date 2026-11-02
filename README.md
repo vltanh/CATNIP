@@ -36,6 +36,10 @@ uv pip install --torch-backend=cpu .
 Installation builds the native programs and includes the trained model.
 Pip is also supported: `python -m pip install .`.
 
+CATNIP was previously named CAMUS-NN. The Python package is now `catnip`,
+and the commands are `catnip`, `catnip-prepare`, `catnip-train`, and
+`catnip-evaluate`. Existing trained model files remain supported.
+
 ## Inference
 
 Inputs are gene trees (one Newick tree per line) and a binary guide tree on
@@ -48,20 +52,20 @@ automatically.
 
 ```bash
 # Original CAMUS.
-camus-nn --method orig --genes examples/validation/genes.nwk \
-  --guide examples/validation/guide.nwk --out ../camus-results/camus
+catnip --method orig --genes examples/validation/genes.nwk \
+  --guide examples/validation/guide.nwk --out ../catnip-results/camus
 
 # Learned quartet filtering.
-camus-nn --method lqf --genes examples/validation/genes.nwk \
-  --guide examples/validation/guide.nwk --out ../camus-results/lqf
+catnip --method lqf --genes examples/validation/genes.nwk \
+  --guide examples/validation/guide.nwk --out ../catnip-results/lqf
 
 # Learned quartet weighting.
-camus-nn --method lqw --genes examples/validation/genes.nwk \
-  --guide examples/validation/guide.nwk --out ../camus-results/lqw
+catnip --method lqw --genes examples/validation/genes.nwk \
+  --guide examples/validation/guide.nwk --out ../catnip-results/lqw
 
 # LQW with guide refinement.
-camus-nn --method lqw --iterate --genes examples/validation/genes.nwk \
-  --guide examples/validation/guide.nwk --out ../camus-results/lqw-iter
+catnip --method lqw --iterate --genes examples/validation/genes.nwk \
+  --guide examples/validation/guide.nwk --out ../catnip-results/lqw-iter
 ```
 
 LQF and LQW use the bundled model automatically. To use your own model, add
@@ -77,8 +81,8 @@ outside reticulation cycles. Gene-tree roots are not used for quartet counting.
 For data without a known outgroup, use the root represented in the guide:
 
 ```bash
-camus-nn --method lqw --genes gene-trees.nwk --guide astral.nwk \
-  --guide-rooting supplied --out ../camus-results/supplied-guide
+catnip --method lqw --genes gene-trees.nwk --guide astral.nwk \
+  --guide-rooting supplied --out ../catnip-results/supplied-guide
 ```
 
 This keeps the guide's taxon names and applies no outgroup constraint. The
@@ -108,7 +112,7 @@ establish a biological root. The same rooting flag works with `--iterate`.
 All uses every quartet. Rooted uses every quartet containing `OUT` once.
 Uniform samples globally; EU and EW sample around guide edges. Repeated draws
 retain their multiplicity. See the [full inference reference](docs/inference.md)
-for sampling, memory, and search details, or run `camus-nn --help`.
+for sampling, memory, and search details, or run `catnip --help`.
 
 ### Outputs
 
@@ -128,9 +132,9 @@ are removed after the run's processes stop, including on failure.
 Compare a true and inferred network on the same taxa:
 
 ```bash
-camus-nn-evaluate --truth true-network.nwk \
-  --estimate ../camus-results/lqw/network.nwk \
-  --output ../camus-results/scores.json
+catnip-evaluate --truth true-network.nwk \
+  --estimate ../catnip-results/lqw/network.nwk \
+  --output ../catnip-results/scores.json
 ```
 
 The command prints JSON and optionally saves it to a new file. It reports
@@ -176,18 +180,18 @@ uv pip install --torch-backend=cpu '.[train]'
 Train directly from true networks and their gene trees:
 
 ```bash
-camus-nn-train --training-cases examples/training/cases.json \
-  --output-model ../camus-results/training/model.json --seed 42
+catnip-train --training-cases examples/training/cases.json \
+  --output-model ../catnip-results/training/model.json --seed 42
 ```
 
 Alternatively, prepare a reusable labeled quartet table, then fit from it:
 
 ```bash
-camus-nn-prepare --training-cases examples/training/cases.json \
-  --output-table ../camus-results/training/quartets.csv
+catnip-prepare --training-cases examples/training/cases.json \
+  --output-table ../catnip-results/training/quartets.csv
 
-camus-nn-train --quartet-table ../camus-results/training/quartets.csv \
-  --output-model ../camus-results/training/model-from-table.json --seed 42
+catnip-train --quartet-table ../catnip-results/training/quartets.csv \
+  --output-model ../catnip-results/training/model-from-table.json --seed 42
 ```
 
 The case list is a JSON array. Paths are relative to the JSON file:
@@ -203,7 +207,7 @@ Keep training cases separate from validation and test cases. The included
 example has one 26-taxon training network; it demonstrates the commands and
 does not recreate the bundled model's full training cohort.
 
-Use `--model ../camus-results/training/model.json` for inference with the new
+Use `--model ../catnip-results/training/model.json` for inference with the new
 model. Training uses seed `42` and eight hidden units by default. Each network
 receives equal total weight. See [training options](docs/training.md#fitting)
 and [input formats](docs/training.md#input-formats) for the CSV schema,
@@ -215,7 +219,7 @@ After installing the package, check that fresh runs produce identical candidate
 curves and selected networks:
 
 ```bash
-python scripts/check_reproducibility.py --out ../camus-results/reproducibility
+python scripts/check_reproducibility.py --out ../catnip-results/reproducibility
 ```
 
 This covers Original CAMUS, LQF, LQW, iteration, and supplied-root inference.

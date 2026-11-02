@@ -326,9 +326,9 @@ def main(argv=None):
             version = "python-cluster-set/v1-" + ("rooted" if outgroup is None else "reference-taxon")
             hwcd_units = "raw distinct-cluster differences"
         parameters = (json.loads(scores.pop("metric_parameters_json")) if external else
-                      dict(implementation="camus_nn.evaluate", outgroup=outgroup,
+                      dict(implementation="catnip.evaluate", outgroup=outgroup,
                            source_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()))
-        result = dict(schema="camus-nn-evaluation/v1", inputs=inputs, metric=args.metric,
+        result = dict(schema="catnip-evaluation/v1", inputs=inputs, metric=args.metric,
             metric_version=version, metric_parameters=parameters,
             outgroup=outgroup, max_switchings=cap,
             rate_units=None if args.metric == "phylonetworks-hwcd" else "fraction", hwcd_units=hwcd_units,

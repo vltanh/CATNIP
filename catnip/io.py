@@ -19,7 +19,7 @@ def save(path, value):
 
 
 def save_model(path, model):
-    save(path, dict(schema='camus-nn-frequency/v1', architecture=[3, model.hidden_width, 3],
+    save(path, dict(schema='catnip-frequency/v1', architecture=[3, model.hidden_width, 3],
         feature_mode='sorted', seed=model.seed, weight_decay=model.weight_decay,
         mean=model.mean_.tolist(), scale=model.scale_.tolist(),
         parameters=model.parameters_.tolist(), optimization=model.optimization_))
@@ -29,9 +29,10 @@ def load_model(path):
     from .model import ShallowNetwork
     value = json.loads(Path(path).read_text())
     architecture = value.get('architecture', [])
-    if (value.get('schema') != 'camus-nn-frequency/v1' or value.get('feature_mode') != 'sorted'
+    # Keep existing checkpoints readable without rewriting their model bytes.
+    if (value.get('schema') not in ('catnip-frequency/v1', 'camus-nn-frequency/v1') or value.get('feature_mode') != 'sorted'
             or len(architecture) != 3 or architecture[0] != 3 or architecture[2] != 3):
-        raise ValueError('Expected a CAMUS-NN sorted-frequency model')
+        raise ValueError('Expected a CATNIP sorted-frequency model')
     model = ShallowNetwork(seed=value['seed'], hidden_width=architecture[1],
                            weight_decay=value['weight_decay'])
     model.mean_ = np.asarray(value['mean'], dtype=float)

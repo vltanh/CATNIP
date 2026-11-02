@@ -14,12 +14,12 @@ IQ-TREE gene trees and ASTRAL guide. Choose a new output directory for every run
 python misc/camus_original.py \
   --gene-trees examples/validation/genes.nwk \
   --starting-tree examples/validation/guide.nwk \
-  --output-directory ../camus-results/camus-original
+  --output-directory ../catnip-results/camus-original
 ```
 
 This runs original CAMUS with the included C++ implementation, using every
 quartet, filter mode 2, and threshold 0.5. The NN is unused. The runner calls
-`camus-nn --method orig` and saves `network.nwk`, the full candidate curve in
+`catnip --method orig` and saves `network.nwk`, the full candidate curve in
 `network.csv`, `prediction.json`, native metrics, and logs.
 
 **Inputs and output**
@@ -55,20 +55,20 @@ python misc/brooqs.py \
   --gene-trees examples/validation/genes.nwk \
   --starting-tree examples/validation/guide.nwk \
   --outgroup OUT --rooted --tob-search 3f1a \
-  --output-directory ../camus-results/brooqs
+  --output-directory ../catnip-results/brooqs
 
 # Exhaustive ToB search instead of 3-fix-1-alter search.
 python misc/brooqs.py \
   --gene-trees examples/validation/genes.nwk \
   --starting-tree examples/validation/guide.nwk \
   --outgroup OUT --rooted --tob-search exhaustive \
-  --output-directory ../camus-results/brooqs-exhaustive
+  --output-directory ../catnip-results/brooqs-exhaustive
 
 # Resolve an existing ToB without repeating its estimation.
 python misc/brooqs.py \
   --gene-trees examples/validation/genes.nwk \
-  --tree-of-blobs ../camus-results/brooqs/tree-of-blobs.nwk --rooted \
-  --output-directory ../camus-results/brooqs-resolve
+  --tree-of-blobs ../catnip-results/brooqs/tree-of-blobs.nwk --rooted \
+  --output-directory ../catnip-results/brooqs-resolve
 ```
 
 The runner uses TREE-QMC 4.1.5 revision `53b15e5c` and BROOQS revision
@@ -82,7 +82,7 @@ root should constrain BROOQS resolution. The examples above use the known
 
 ```bash
 python misc/brooqs.py --gene-trees gene-trees.nwk --starting-tree astral.nwk \
-  --tob-search exhaustive --output-directory ../camus-results/brooqs-astral
+  --tob-search exhaustive --output-directory ../catnip-results/brooqs-astral
 ```
 
 **Inputs, output, and search mode**
@@ -132,7 +132,7 @@ python misc/snaq.py \
   --starting-tree examples/test/guide.nwk \
   --max-reticulations 1 --runs 32 --seed 42 \
   --search-workers 8 --threads 4 --max-failures 75 \
-  --output-directory ../camus-results/snaq
+  --output-directory ../catnip-results/snaq
 ```
 
 Use Julia 1.11.6 with the included environment, which locks SNaQ 1.2.1,
@@ -186,7 +186,7 @@ python misc/phylonet_mpl.py \
   --gene-trees examples/test/genes.nwk \
   --starting-tree examples/test/guide.nwk \
   --max-reticulations 1 --runs 10 --seed 42 \
-  --threads 8 --heap 6g --output-directory ../camus-results/phylonet-mpl
+  --threads 8 --heap 6g --output-directory ../catnip-results/phylonet-mpl
 ```
 
 This runs PhyloNet 3.8.2 with OpenJDK 17 using native `InferNetwork_MPL`:

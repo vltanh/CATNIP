@@ -74,7 +74,7 @@ def main():
         x, y, weights, cases = training_arrays(args.quartet_table)
     else:
         from .prepare import prepare_training_csv
-        with tempfile.TemporaryDirectory(prefix='camus-nn-train-') as directory:
+        with tempfile.TemporaryDirectory(prefix='catnip-train-') as directory:
             table = Path(directory) / 'training.csv'
             prepare_training_csv(args.training_cases, table, counter=args.bin_dir / 'camus-count',
                                  threads=args.threads, max_switchings=args.max_switchings)

@@ -7,21 +7,21 @@ root. Each has 16 taxa including `OUT`, 1,000 IQ-TREE gene trees, and an ASTRAL 
 Temporary files are managed automatically inside each output directory.
 
 ```bash
-camus-nn --method orig --genes examples/validation/genes.nwk \
-  --guide examples/validation/guide.nwk --out ../camus-results/val-camus
+catnip --method orig --genes examples/validation/genes.nwk \
+  --guide examples/validation/guide.nwk --out ../catnip-results/val-camus
 
-camus-nn --method lqf \
+catnip --method lqf \
   --genes examples/validation/genes.nwk \
-  --guide examples/validation/guide.nwk --out ../camus-results/val-lqf
+  --guide examples/validation/guide.nwk --out ../catnip-results/val-lqf
 
-camus-nn --method lqw \
+catnip --method lqw \
   --genes examples/test/genes.nwk \
-  --guide examples/test/guide.nwk --out ../camus-results/test-lqw
+  --guide examples/test/guide.nwk --out ../catnip-results/test-lqw
 
-camus-nn --method lqw \
+catnip --method lqw \
   --iterate \
   --genes examples/validation/genes.nwk \
-  --guide examples/validation/guide.nwk --out ../camus-results/val-iter
+  --guide examples/validation/guide.nwk --out ../catnip-results/val-iter
 ```
 
 For data without a known outgroup, use `--guide-rooting supplied`. This starts
@@ -30,13 +30,13 @@ the taxon names, and applies no outgroup constraint. It does not infer a
 biological root. Use the same flag for fixed-guide and iterative LQW:
 
 ```bash
-camus-nn --method lqw \
+catnip --method lqw \
   --genes gene-trees.nwk --guide astral.nwk --guide-rooting supplied \
-  --out ../camus-results/lqw
+  --out ../catnip-results/lqw
 
-camus-nn --method lqw \
+catnip --method lqw \
   --genes gene-trees.nwk --guide astral.nwk --guide-rooting supplied \
-  --iterate --out ../camus-results/lqw-iter
+  --iterate --out ../catnip-results/lqw-iter
 ```
 
 Newick represents the root with its outermost node, not a special label.
@@ -120,7 +120,7 @@ frequencies. Each selected quartet needs a resolved gene-tree observation.
 After installing the package, repeat the documented methods in fresh directories:
 
 ```bash
-python scripts/check_reproducibility.py --out ../camus-results/reproducibility
+python scripts/check_reproducibility.py --out ../catnip-results/reproducibility
 ```
 
 The check compares complete candidate curves and selected networks for Original

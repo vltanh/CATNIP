@@ -5,7 +5,7 @@ __pycache__/
 build/
 dist/
 out-*/
-camus_nn/bin/
-camus_nn/models/
-camus_nn/licenses/
+catnip/bin/
+catnip/models/
+catnip/licenses/
 vendor/

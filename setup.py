@@ -40,12 +40,12 @@ def build_assets(package):
 class BuildPackage(build_py):
     def run(self):
         super().run()
-        package = ROOT / 'camus_nn' if self.editable_mode else Path(self.build_lib) / 'camus_nn'
+        package = ROOT / 'catnip' if self.editable_mode else Path(self.build_lib) / 'catnip'
         build_assets(package)
 
     def get_outputs(self, include_bytecode=1):
         outputs = super().get_outputs(include_bytecode)
-        package = ROOT / 'camus_nn' if self.editable_mode else Path(self.build_lib) / 'camus_nn'
+        package = ROOT / 'catnip' if self.editable_mode else Path(self.build_lib) / 'catnip'
         return outputs + [str(package / 'bin' / name) for name in PROGRAMS] + [
             str(package / 'models/all-frequency.json'),
             *[str(package / 'licenses' / name) for name in LICENSES]]

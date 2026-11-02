@@ -16,7 +16,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from camus_nn.rooting import root_on_outgroup, tree_graph
+from catnip.rooting import root_on_outgroup, tree_graph
 
 JAR_SHA256 = 'eefabc198f113d3c835d67a44206203382e99a582d199478cc53f0bb746658fb'
 

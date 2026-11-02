@@ -10,16 +10,16 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from camus_nn.evaluate import main
-from camus_nn.phylonet_sw import PhyloNetSW, parse_result
-from camus_nn.phylonetworks_hwcd import PhyloNetworksHWCD
+from catnip.evaluate import main
+from catnip.phylonet_sw import PhyloNetSW, parse_result
+from catnip.phylonetworks_hwcd import PhyloNetworksHWCD
 
 NETWORK = "(O,(((D,C),(A,B)#H1),(#H1,E)));"
 REROOTED = "(E,(#H1,(O,((D,C),(A,B)#H1))));"
-JAR = os.environ.get("CAMUS_NN_PHYLONET_JAR")
-JULIA = os.environ.get("CAMUS_NN_JULIA")
-JULIA_PROJECT = os.environ.get("CAMUS_NN_JULIA_PROJECT")
-JULIA_DEPOT = os.environ.get("CAMUS_NN_JULIA_DEPOT")
+JAR = os.environ.get("CATNIP_PHYLONET_JAR")
+JULIA = os.environ.get("CATNIP_JULIA")
+JULIA_PROJECT = os.environ.get("CATNIP_JULIA_PROJECT")
+JULIA_DEPOT = os.environ.get("CATNIP_JULIA_DEPOT")
 
 
 class ConfigurationTests(unittest.TestCase):
@@ -86,7 +86,7 @@ class ConfigurationTests(unittest.TestCase):
                             "p=subprocess.Popen([sys.executable,'-c','import time;time.sleep(60)'])\n"
                             "Path('child.pid').write_text(str(p.pid))\ntime.sleep(60)\n")
             java.chmod(0o755)
-            with patch("camus_nn.phylonet_sw.JAR_SHA256", hashlib.sha256(jar.read_bytes()).hexdigest()):
+            with patch("catnip.phylonet_sw.JAR_SHA256", hashlib.sha256(jar.read_bytes()).hexdigest()):
                 with PhyloNetSW(jar=jar, java=java, timeout=.3, workdir=root / "scores") as scorer:
                     with self.assertRaisesRegex(ValueError, "timed out"):
                         scorer.score(NETWORK, NETWORK)
@@ -119,7 +119,7 @@ class ConfigurationTests(unittest.TestCase):
 
 
 @unittest.skipUnless(JAR and Path(JAR).is_file() and shutil.which("java"),
-                     "Set CAMUS_NN_PHYLONET_JAR for upstream PhyloNet integration tests")
+                     "Set CATNIP_PHYLONET_JAR for upstream PhyloNet integration tests")
 class PhyloNetIntegrationTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
@@ -171,7 +171,7 @@ class PhyloNetIntegrationTests(unittest.TestCase):
 
 
 @unittest.skipUnless(JULIA and shutil.which(JULIA),
-                     "Set CAMUS_NN_JULIA and its environment for upstream PhyloNetworks tests")
+                     "Set CATNIP_JULIA and its environment for upstream PhyloNetworks tests")
 class PhyloNetworksIntegrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

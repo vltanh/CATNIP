@@ -101,7 +101,7 @@ def refine(guide, evidence, output, solve, *, max_guide_runs=5, max_rounds=10,
     stop_reason = 'local_optimum'
 
     def checkpoint(status='running'):
-        report = dict(schema='camus-nn-iteration/v1', status=status,
+        report = dict(schema='catnip-iteration/v1', status=status,
             weights_frozen=True,
             guide_rooting='outgroup' if anchor_outgroup else 'supplied',
             outgroup_anchored=anchor_outgroup,

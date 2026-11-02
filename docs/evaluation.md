@@ -21,24 +21,24 @@ output JSON. The scorer never installs packages or downloads a runtime.
 Run from the repository root. With a known outgroup named `OUT`:
 
 ```bash
-camus-nn-evaluate --truth true-network.nwk \
-  --estimate ../camus-results/lqw/network.nwk --outgroup OUT \
-  --output ../camus-results/scores-outgroup.json
+catnip-evaluate --truth true-network.nwk \
+  --estimate ../catnip-results/lqw/network.nwk --outgroup OUT \
+  --output ../catnip-results/scores-outgroup.json
 ```
 
 To use the roots represented in the two network Newick records instead:
 
 ```bash
-camus-nn-evaluate --truth true-network.nwk \
-  --estimate ../camus-results/lqw/network.nwk --rooted \
-  --output ../camus-results/scores-rooted.json
+catnip-evaluate --truth true-network.nwk \
+  --estimate ../catnip-results/lqw/network.nwk --rooted \
+  --output ../catnip-results/scores-rooted.json
 ```
 
 The command prints JSON and optionally saves it to a new file. It never
 modifies the input networks or overwrites an existing output file. Use
 `--metric softwired` or `--metric hardwired` to compute only one family;
 the default `both` computes both. From a source checkout,
-`python -m camus_nn.evaluate` is the equivalent entry point.
+`python -m catnip.evaluate` is the equivalent entry point.
 
 ## Python cluster definitions
 
@@ -130,7 +130,7 @@ does not filter out cases. These are evaluation settings; inference's
 The combined entry point accepts extended-Newick strings:
 
 ```python
-from camus_nn.evaluate import evaluate_networks
+from catnip.evaluate import evaluate_networks
 
 scores = evaluate_networks(true_newick, estimated_newick, outgroup="OUT")
 print(scores["softwired_error"])      # Fraction.
@@ -152,7 +152,7 @@ combined entry point, but their default orientation differs:
 Pass the same `outgroup` explicitly to get matching results:
 
 ```python
-from camus_nn.evaluate import softwired_cluster_distance, hardwired_cluster_distance
+from catnip.evaluate import softwired_cluster_distance, hardwired_cluster_distance
 
 sw = softwired_cluster_distance(true_newick, estimated_newick, outgroup="OUT")
 hw = hardwired_cluster_distance(true_newick, estimated_newick, outgroup="OUT")
@@ -175,10 +175,10 @@ eefabc198f113d3c835d67a44206203382e99a582d199478cc53f0bb746658fb
 Run the actual upstream rooted cluster comparison:
 
 ```bash
-camus-nn-evaluate --metric phylonet-sw \
+catnip-evaluate --metric phylonet-sw \
   --truth true-network.nwk --estimate inferred-network.nwk \
   --sw-jar ../camus-tools/PhyloNet-3.8.2.jar \
-  --output ../camus-results/phylonet-sw.json
+  --output ../catnip-results/phylonet-sw.json
 ```
 
 The truth is passed first to `CmpNets truth estimate -m cluster`. Its FN, FP,
@@ -218,10 +218,10 @@ Keep the resulting `Project.toml` and `Manifest.toml` for repeatable setup.
 An existing environment containing that version can also be selected.
 
 ```bash
-camus-nn-evaluate --metric phylonetworks-hwcd \
+catnip-evaluate --metric phylonetworks-hwcd \
   --truth true-network.nwk --estimate inferred-network.nwk \
   --hwcd-project ../camus-tools/phylonetworks \
-  --output ../camus-results/phylonetworks-hwcd.json
+  --output ../catnip-results/phylonetworks-hwcd.json
 ```
 
 This calls `PhyloNetworks.hardwiredclusterdistance(truth, estimate, false)`
@@ -256,15 +256,15 @@ explicit Julia project, its project/manifest hashes are recorded too.
 Supply a work directory for retained logs and provenance:
 
 ```python
-from camus_nn.phylonet_sw import PhyloNetSW
-from camus_nn.phylonetworks_hwcd import PhyloNetworksHWCD
+from catnip.phylonet_sw import PhyloNetSW
+from catnip.phylonetworks_hwcd import PhyloNetworksHWCD
 
 with PhyloNetSW(jar="../camus-tools/PhyloNet-3.8.2.jar",
-               workdir="../camus-results/sw") as scorer:
+               workdir="../catnip-results/sw") as scorer:
     sw = scorer.score(true_newick, estimated_newick)
 
 with PhyloNetworksHWCD(julia_project="../camus-tools/phylonetworks",
-                      workdir="../camus-results/hwcd") as scorer:
+                      workdir="../catnip-results/hwcd") as scorer:
     hw = scorer.score(true_newick, estimated_newick)  # rooted=False
     rooted_hw = scorer.score(true_newick, estimated_newick, rooted=True)
 ```
@@ -302,5 +302,5 @@ substituted. Hardwired-only evaluation skips displayed-tree extraction.
 The evaluator supports binary reticulations, tree polytomies, and parallel
 edges; repeated clusters are counted once.
 
-See the [implementation](../camus_nn/evaluate.py) and
+See the [implementation](../catnip/evaluate.py) and
 [evaluation tests](../tests/test_evaluate.py) for the exact behavior.

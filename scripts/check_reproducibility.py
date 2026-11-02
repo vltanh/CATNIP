@@ -32,16 +32,16 @@ def main():
     def run(command,log):
         with (output/log).open('w') as stream:
             subprocess.run(command,cwd=output,env=env,stdout=stream,stderr=subprocess.STDOUT,check=True)
-    probe=('import json,platform,camus_nn,numpy,torch,networkx; '
-        'from camus_nn.infer import DEFAULT_BIN_DIR,DEFAULT_MODEL; '
-        'print(json.dumps(dict(package=camus_nn.__file__,python=platform.python_version(),'
+    probe=('import json,platform,catnip,numpy,torch,networkx; '
+        'from catnip.infer import DEFAULT_BIN_DIR,DEFAULT_MODEL; '
+        'print(json.dumps(dict(package=catnip.__file__,python=platform.python_version(),'
         'numpy=numpy.__version__,torch=torch.__version__,networkx=networkx.__version__,'
         'bin_dir=str(DEFAULT_BIN_DIR),model=str(DEFAULT_MODEL))))')
     installed=json.loads(subprocess.check_output([sys.executable,'-B','-c',probe],cwd=output,env=env,text=True))
     if Path(installed['package']).resolve().is_relative_to(ROOT):
         raise ValueError('Run this check against an installed wheel, rather than an editable source checkout')
     assert sha(installed['model'])==sha(ROOT/'models/all-frequency.json'),'Bundled model differs from checkout'
-    report=dict(schema='camus-nn-reproducibility/v1',installed=installed,checks=[],
+    report=dict(schema='catnip-reproducibility/v1',installed=installed,checks=[],
         scope='Exact repeatability on this host; not a guarantee across all hardware/library versions',
         cpu=next((line.split(':',1)[1].strip() for line in Path('/proc/cpuinfo').read_text().splitlines()
                   if line.startswith('model name')),'unknown'),
@@ -62,7 +62,7 @@ def main():
             runs=[]
             for repeat in (1,2):
                 destination=output/f'{dataset}-{method}-{repeat}'
-                command=[sys.executable,'-B','-m','camus_nn.infer','--method',method if method!='iter' else 'lqw',
+                command=[sys.executable,'-B','-m','catnip.infer','--method',method if method!='iter' else 'lqw',
                     '--genes',str(genes),'--guide',str(guide),'--guide-rooting',rooting,
                     '--sampler','all','--threads','1','--case','reproducibility/'+dataset,
                     '--out',str(destination)]
@@ -90,12 +90,12 @@ def main():
         table=output/'training.csv';common=[sys.executable,'-B','-m']
         extra=['--bin-dir',str(args.bin_dir.resolve())] if args.bin_dir else []
         cases=ROOT/'examples/training/cases.json'
-        run([*common,'camus_nn.prepare','--training-cases',str(cases),'--output-table',str(table),*extra],'prepare.log')
+        run([*common,'catnip.prepare','--training-cases',str(cases),'--output-table',str(table),*extra],'prepare.log')
         models=[]
         for name,mode,source in [('fit-1','quartet-table',table),('fit-2','quartet-table',table),
                                   ('fit-direct','training-cases',cases)]:
             model=output/(name+'.json');models.append(model)
-            command=[*common,'camus_nn.train','--'+mode,str(source),'--output-model',str(model),'--seed','42']
+            command=[*common,'catnip.train','--'+mode,str(source),'--output-model',str(model),'--seed','42']
             if mode=='training-cases':command+=extra
             run(command,name+'.log')
         assert len({sha(p) for p in models})==1,'Example fits differ'

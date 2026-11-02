@@ -13,11 +13,11 @@ from unittest.mock import patch
 
 import networkx as nx
 
-from camus_nn.evaluate import (
+from catnip.evaluate import (
     cluster_summary, evaluate_networks, hardwired_cluster_distance,
     hardwired_clusters, main, softwired_cluster_distance,
 )
-from camus_nn.topology import parse_network
+from catnip.topology import parse_network
 
 TREE = '(OUT,((A,B),(C,D)));'
 ONE = '(OUT,((A,(B)#H1),(#H1,(C,D))));'
@@ -146,7 +146,7 @@ class EvaluationTests(unittest.TestCase):
                 cluster_summary(TREE, cap=cap)
 
     def test_hardwired_only_does_not_run_softwired_extraction(self):
-        with patch('camus_nn.evaluate.cluster_summary', side_effect=AssertionError('SW was called')):
+        with patch('catnip.evaluate.cluster_summary', side_effect=AssertionError('SW was called')):
             result = evaluate_networks(ONE, TREE, metric='hardwired', cap=1)
         self.assertNotIn('softwired_fn', result)
         self.assertEqual(result, hardwired_cluster_distance(ONE, TREE, outgroup='OUT'))
@@ -170,7 +170,7 @@ class EvaluationTests(unittest.TestCase):
             with redirect_stderr(StringIO()), self.assertRaises(SystemExit):
                 main(argv)
             self.assertEqual(output.read_bytes(), before)
-            run = subprocess.run([sys.executable, '-B', '-m', 'camus_nn.evaluate',
+            run = subprocess.run([sys.executable, '-B', '-m', 'catnip.evaluate',
                 '--truth', str(truth), '--estimate', str(estimate), '--metric', 'hardwired'],
                 capture_output=True, text=True, check=True)
             self.assertEqual(json.loads(run.stdout)['scores']['hardwired_distance'], 1)
