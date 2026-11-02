@@ -1,6 +1,6 @@
-# CAMUS-NN
+# CATNIP
 
-CAMUS-NN reconstructs level-1 phylogenetic networks from discordant gene trees.
+CATNIP reconstructs level-1 phylogenetic networks from discordant gene trees.
 Starting from a rooted guide tree, it adds reticulation edges to optimize a
 weighted quartet score.
 
@@ -14,9 +14,9 @@ candidate networks, scores, and logs.
   filter quartets (`--method lqf`).
 - **CAMUS-LQW** (Learned Quartet Weighting) uses the network's predictions as
   quartet weights (`--method lqw`, the default).
-- **CAMUS-LQW + iteration** refines the guide through single-cycle SPR moves
-  and reruns LQW with the same quartet evidence, for up to five solves by
-  default (`--iterate`).
+- **CAMUS-LQW+iter** modifies the guide through single-cycle SPR moves
+  and reruns CAMUS-LQW with the same quartet evidence, for up to five solves
+  by default (`--iterate`).
 
 LQF and LQW share the included trained model.
 
@@ -26,8 +26,8 @@ Requires Linux, Python 3.11+, and a C++17 compiler with OpenMP support
 (GCC 11+). With [uv](https://docs.astral.sh/uv/getting-started/installation/):
 
 ```bash
-git clone https://github.com/vltanh/CAMUS-NN.git
-cd CAMUS-NN
+git clone https://github.com/vltanh/CATNIP.git
+cd CATNIP
 uv venv --python 3.11
 source .venv/bin/activate
 uv pip install --torch-backend=cpu .
