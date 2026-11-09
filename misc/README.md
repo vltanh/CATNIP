@@ -124,6 +124,32 @@ python misc/brooqs.py --gene-trees gene-trees.nwk --starting-tree astral.nwk \
 Output includes `network.nwk` and `brooqs.log`. ToB estimation also saves
 `tree-of-blobs.nwk` and `tob-qmc.log`.
 
+### Count blobs in an existing ToB
+
+```bash
+python -m pip install treeswift==1.1.48
+python misc/count_tob_blobs.py ../catnip-results/brooqs/tree-of-blobs.nwk
+python misc/count_tob_blobs.py ../catnip-results/brooqs/tree-of-blobs.nwk --json
+```
+
+`count_tob_blobs.py` is a standalone script using
+[TreeSwift](https://niema.net/TreeSwift/) to parse the tree; it can be copied
+outside this repository without installing CATNIP. TreeSwift 1.1.48 is the
+tested version and its only additional dependency. The default output is one
+integer. `--json` also reports `blob_degrees` (largest first) and `leaf_count`.
+
+Blobs are ToB vertices with **unrooted degree at least four**: count the child
+components plus the parent-side component when it contains taxa. Root placement,
+branch lengths, support labels and bracket comments do not affect the count.
+Ordinary degree-three branching vertices are excluded. This counts unresolved
+ToB vertices, not the reticulations in a resolved network.
+
+Supply a file containing exactly one ordinary Newick tree ending in `;`, with
+unique nonempty leaf labels. Extended Newick hybrid labels are rejected. The
+script reads the selected file and writes the result to stdout; it performs no
+inference, shell execution or network access. Errors reported by the parser
+produce a nonzero exit status and no count.
+
 ## SNaQ
 
 ```bash
